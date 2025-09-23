@@ -3,7 +3,7 @@ from . import views
 from django.conf import settings
 
 urlpatterns = [
-    path('profile/', views.profile, name='profile'),
+    path('profile/<int:id>/', views.profile, name='profile'),
     path('profile/edit/', views.edit_profile, name='edit_profile'),
     path('activity/new/', views.create_activity, name='create_activity'),
     path('activity/<int:pk>/subscribe/', views.subscribe_activity, name='subscribe_activity'),

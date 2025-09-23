@@ -1,9 +1,8 @@
-from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404, render
 from django.contrib import messages
 from .forms import CustomAuthenticationForm, EditProfileForm, ActivityForm, RegisterForm
-from .models import Activity
+from .models import Activity, User
 from django.core.exceptions import ValidationError
 from django.conf import settings
 
@@ -108,11 +107,10 @@ def create_activity(request):
         'form': form,
     })
 
-def profile(request):
-    if not request.user.is_authenticated:
-        return redirect('login')
+def profile(request, id=None):
     MEDIA_URL = settings.MEDIA_URL
-    return render(request, 'registration/profile.html', {'MEDIA_URL': MEDIA_URL})
+    user = get_object_or_404(User, id=id)
+    return render(request, 'registration/profile.html', {'MEDIA_URL': MEDIA_URL , 'user': user})
 
 def edit_profile(request):
     if not request.user.is_authenticated:
