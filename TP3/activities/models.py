@@ -44,7 +44,7 @@ class Activity(models.Model):
     end_time = models.DateTimeField(verbose_name="Date et heure de fin")
     proposer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='proposed_activities', verbose_name="Organisateur")
     attendees = models.ManyToManyField(User, blank=True, related_name='attended_activities', verbose_name="Participants")
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='activities', verbose_name="Catégorie")
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, blank=True, null=True, related_name='activities', verbose_name="Catégorie")
 
     def clean(self):
         super().clean()

@@ -1,14 +1,11 @@
 from django.shortcuts import render
-from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import redirect
 from django.contrib import messages
-from .forms import RegisterForm
-from .forms import CustomAuthenticationForm
+from .forms import CustomAuthenticationForm, EditProfileForm, ActivityForm, RegisterForm
 from .models import Activity
 from django.core.exceptions import ValidationError
-from .forms import ActivityForm
-from django.contrib.auth.decorators import login_required
+from django.conf import settings
 
 def base(request):
     activities = Activity.objects.all()
@@ -111,3 +108,23 @@ def create_activity(request):
         'form': form,
     })
 
+def profile(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    MEDIA_URL = settings.MEDIA_URL
+    return render(request, 'registration/profile.html', {'MEDIA_URL': MEDIA_URL})
+
+def edit_profile(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    if request.method == 'POST':
+        form = EditProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profil mis à jour avec succès !')
+            return redirect('profile')
+        else:
+            messages.error(request, 'Veuillez corriger les erreurs ci-dessous.')
+
+    form = EditProfileForm(instance=request.user)
+    return render(request, 'registration/edit_profile.html', {'form': form})
