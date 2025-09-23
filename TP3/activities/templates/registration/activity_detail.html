@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ activity.title }}</h2>
+    <p>{{ activity.description }}</p>
+
+    <ul class="list-group mb-3">
+        <li class="list-group-item"><strong>Catégorie :</strong> {{ activity.category }}</li>
+        <li class="list-group-item"><strong>Ville :</strong> {{ activity.location_city }}</li>
+        <li class="list-group-item"><strong>Début :</strong> {{ activity.start_time }}</li>
+        <li class="list-group-item"><strong>Fin :</strong> {{ activity.end_time }}</li>
+        <li class="list-group-item">
+            <strong>Organisateur :</strong>
+            {{ activity.proposer.username }}</a>
+        </li>
+        <li class="list-group-item">
+            <strong>Participants :</strong>
+            {% for user in activity.attendees.all %}
+            {{ user.username }}
+            {% endfor %}
+        </li>
+    </ul>
+
+    {% if user.is_authenticated %}
+    {% if user in activity.attendees.all %}
+    <form method="post" action="{% url 'unsubscribe_activity' activity.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Se désinscrire</button>
+    </form>
+    {% else %}
+    <form method="post" action="{% url 'subscribe_activity' activity.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">S'inscrire</button>
+    </form>
+    {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

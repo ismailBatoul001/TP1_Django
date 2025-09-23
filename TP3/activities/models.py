@@ -18,7 +18,7 @@ class User(AbstractUser):
         verbose_name="Biographie"
     )
     def __str__(self):
-        return self.username
+        return f"{self.username} ({self.first_name} {self.last_name})"
 
     class Meta:
         verbose_name = "Utilisateur"
