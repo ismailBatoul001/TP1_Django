@@ -20,16 +20,34 @@
                 aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
+            {% if user.is_authenticated %}
+            <a href="{% url 'create_activity' %}" class="btn btn-primary mt-2">
+                Créer une activité
+            </a>
+            {% endif %}
 
             <div class="collapse navbar-collapse" id="navbarContent">
                 <ul class="navbar-nav ms-auto">
-                    {% if user.is_authenticated %}
+                {% if user.is_authenticated %}
+                    {% if user.avatar %}
                     <li class="nav-item">
-                        <a href="{% url 'profile' user.id %}" class="nav-link">Bienvenue, {{ user.get_full_name|default:user.username }} !</a>
+                        <a href="{% url 'profile' user.id %}" class="nav-link">
+                            <img src="{{ user.avatar.url }}" alt="Avatar de {{ user.username }}" class="rounded-circle"
+                                width="30" height="30"> {{ user.get_full_name|default:user.username }} !</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'logout' %}">Se déconnecter</a>
                     </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a href="{% url 'profile' user.id %}" class="nav-link">
+                            <img src="{{ MEDIA_URL }}avatars/default-avatar.png" alt="Avatar par défaut"
+                                class="rounded-circle me-3" width="30" height="30"> {{ user.get_full_name|default:user.username }} !</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Se déconnecter</a>
+                    </li>
+                    {% endif %}
                     {% else %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'login' %}">Se connecter</a>
@@ -37,7 +55,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'signup' %}">S'inscrire</a>
                     </li>
-                    {% endif %}
+                {% endif %}
                 </ul>
             </div>
         </div>

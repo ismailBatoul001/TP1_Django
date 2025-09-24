@@ -24,22 +24,25 @@
         {% csrf_token %}
 
         <div class="mb-3">
-            {{ form.username.label_tag }}
+            {{ form.username.label_tag }}<span style="color: red;">*</span>
+
             {{ form.username}}
         </div>
 
         <div class="mb-3">
-            {{ form.email.label_tag }}
+            {{ form.email.label_tag }}<span style="color: red;">*</span>
+
             {{ form.email}}
         </div>
 
         <div class="mb-3">
-            {{ form.password1.label_tag }}
+            {{ form.password1.label_tag }}<span style="color: red;">*</span>
+
             {{ form.password1}}
         </div>
 
         <div class="mb-3">
-            {{ form.password2.label_tag }}
+            {{ form.password2.label_tag }}<span style="color: red;">*</span>
             {{ form.password2}}
         </div>
 

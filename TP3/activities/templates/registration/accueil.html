@@ -3,23 +3,81 @@
 {% block content %}
 <div class="container mt-4">
     <h1 class="mb-4 text-center">Activités à venir</h1>
+    <div class="display-flex justify-content-between align-items-center mb-4">
+        <div class="mb-4 card card-body shadow-sm" style="width: 360px;">
+            <form method="get" class="filter-form-manual">
+                <div class="filter-group d-flex align-items-center gap-3">
+                    <select name="category" id="category-select-manual" class="form-select">
+                        <option value="">Toutes les catégories</option>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-primary">Filtrer</button>
+                </div>
+            </form>
+        </div>
+        {% if user.is_authenticated %}
+        <div class="d-flex gap-4">
+            <form method="get">
+                {% if show_mes_activities == 'true' %}
+                {% if selected_category %}
+                <input type="hidden" name="category" value="{{ selected_category }}">
+                {% endif %}
+                <button type="submit" class="btn btn-secondary">
+                    <i class="fas fa-list"></i> Voir toutes les activités
+                </button>
+                {% else %}
+                {% if selected_category %}
+                <input type="hidden" name="category" value="{{ selected_category }}">
+                {% endif %}
+                <input type="hidden" name="mes_activities" value="true">
+                <button type="submit" class="btn btn-outline-primary">
+                    <i class="fas fa-user"></i> Mes activités proposées
+                </button>
+                {% endif %}
+            </form>
+            <form method="get">
+                {% if show_mes_inscriptions == 'true' %}
+                {% if selected_category %}
+                <input type="hidden" name="category" value="{{ selected_category }}">
+                {% endif %}
+                <button type="submit" class="btn btn-secondary">
+                    <i class="fas fa-list"></i> Voir toutes les activités
+                </button>
+                {% else %}
+                {% if selected_category %}
+                <input type="hidden" name="category" value="{{ selected_category }}">
+                {% endif %}
+                <input type="hidden" name="mes_inscriptions" value="true">
+                <button type="submit" class="btn btn-outline-primary">
+                    <i class="fas fa-user"></i> Mes inscriptions
+                </button>
+                {% endif %}
+            </form>
+        </div>
+        {% endif %}
+    </div>
     {% if activities %}
     <div class="row">
-        {% for activity in activities %}
+        {% for activity in page_obj %}
         <div class="col-md-6 col-lg-4 mb-4">
             <div class="card h-100 shadow-sm">
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">{{ activity.title }}</h5>
                     <p class="card-text text-muted mb-1">
                         <i class="fas fa-map-marker-alt"></i> {{ activity.location_city }} |
-                        <i class="fas fa-tag"></i> {{ activity.category.nom }}
+                        <i class="fas fa-tag"></i> {{ activity.category.name }}
                     </p>
                     <p class="card-text mb-1">
                         <i class="fas fa-calendar"></i>
                         {{ activity.start_time }} - {{ activity.end_time }}
                     </p>
                     <p class="card-text mb-3">
-                        <i class="fas fa-user"></i> Organisateur: <strong>{{ activity.proposer.username }}</a></strong>
+                        <i class="fas fa-user"></i> Organisateur: <strong>{{ activity.proposer.username }}</strong>
+                        {% if activity.proposer == user %}
+                        <span class="badge bg-success ms-2">Vous</span>
+                        {% endif %}
                     </p>
                     <a href="{% url 'activity_detail' activity.id %}" class="btn btn-outline-primary mt-auto">
                         <i class="fas fa-eye"></i> Voir détails
@@ -32,13 +90,34 @@
     {% else %}
     <div class="alert alert-info text-center">
         <h4>Aucune activité trouvée</h4>
-        <p>Il n'y a pas d'activités correspondant à vos critères.</p>
     </div>
     {% endif %}
-    {% if user.is_authenticated %}
-        <a href="{% url 'create_activity' %}" class="btn btn-primary mt-2">
-            Créer une activité
-        </a>
-    {% endif %}
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Précédent</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">Précédent</span></li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            {% if num == page_obj.number %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% else %}
+            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Suivant</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">Suivant</span></li>
+            {% endif %}
+        </ul>
+    </nav>
 </div>
 {% endblock %}

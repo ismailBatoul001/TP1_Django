@@ -2,15 +2,43 @@ from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import redirect, get_object_or_404, render
 from django.contrib import messages
 from .forms import CustomAuthenticationForm, EditProfileForm, ActivityForm, RegisterForm
-from .models import Activity, User
+from .models import Activity, User, Category
 from django.core.exceptions import ValidationError
 from django.conf import settings
+from django.core.paginator import Paginator
+
 
 def base(request):
     activities = Activity.objects.all()
-    return render(request, "registration/accueil.html", {'activities': activities})
+    categories = Category.objects.all()
+    category_id = request.GET.get('category')
+    show_mes_activities = request.GET.get('mes_activities')
+    show_mes_inscriptions = request.GET.get('mes_inscriptions')
 
-def page404(request, exception):
+    if category_id:
+        activities = activities.filter(category__id=category_id)
+    if show_mes_activities == 'true' and request.user.is_authenticated:
+        activities = activities.filter(proposer=request.user)
+    if show_mes_inscriptions == 'true' and request.user.is_authenticated:
+        activities = activities.filter(attendees=request.user)
+
+    paginator = Paginator(activities, 3)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'activities': activities,
+        'page_obj': page_obj,
+        'categories': categories,
+        'selected_category': category_id,
+        'show_mes_activities': show_mes_activities,
+        'show_mes_inscriptions': show_mes_inscriptions,
+        'MEDIA_URL': settings.MEDIA_URL,
+    }
+
+    return render(request, "registration/accueil.html", context)
+
+def page404(request):
     return render(request, "404.html", status=404)
 
 def page500(request):
@@ -59,14 +87,13 @@ def custom_login(request):
 def custom_logout(request):
     logout(request)
     messages.success(request, 'Vous êtes déconnecté avec succès.')
-    return redirect('login')
+    return redirect('home')
 
 def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)
             messages.success(request, 'Compte créé avec succès !')
             return redirect('login')
         else:
