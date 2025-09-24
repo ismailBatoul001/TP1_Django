@@ -10,6 +10,12 @@ def base(request):
     activities = Activity.objects.all()
     return render(request, "registration/accueil.html", {'activities': activities})
 
+def page404(request, exception):
+    return render(request, "404.html", status=404)
+
+def page500(request):
+    return render(request, "500.html", status=500)
+
 def activity_detail(request, pk):
     activity = Activity.objects.get(pk=pk)
     return render(request, "registration/activity_detail.html", {
@@ -116,11 +122,11 @@ def edit_profile(request):
     if not request.user.is_authenticated:
         return redirect('login')
     if request.method == 'POST':
-        form = EditProfileForm(request.POST, instance=request.user)
+        form = EditProfileForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
             messages.success(request, 'Profil mis à jour avec succès !')
-            return redirect('profile')
+            return redirect('profile', id=request.user.id)
         else:
             messages.error(request, 'Veuillez corriger les erreurs ci-dessous.')
 
