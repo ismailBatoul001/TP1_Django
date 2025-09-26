@@ -10,6 +10,7 @@
         <li class="list-group-item"><strong>Ville :</strong> {{ activity.location_city }}</li>
         <li class="list-group-item"><strong>Début :</strong> {{ activity.start_time }}</li>
         <li class="list-group-item"><strong>Fin :</strong> {{ activity.end_time }}</li>
+        <li class="list-group-item"><strong>Qualité de l'air (AQI) :</strong> {{ air_quality }}</li>
         <li class="list-group-item">
             <strong>Organisateur :</strong>
             <a href="{% url 'profile' activity.proposer.id %}">{{ activity.proposer.username }}</a>

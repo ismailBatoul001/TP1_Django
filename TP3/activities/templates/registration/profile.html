@@ -5,8 +5,8 @@
 <div class="container mt-5" style="max-width: 800px;">
     <div class="card mb-4 shadow-sm">
         <div class="card-body d-flex align-items-center">
-            {% if user.avatar %}
-                <img src="{{ user.avatar.url }}"
+            {% if profile_user.avatar %}
+                <img src="{{ profile_user.avatar.url }}"
                      alt="Avatar de {{ user.username }}"
                      class="rounded-circle me-3"
                      width="100" height="100">
@@ -17,10 +17,10 @@
                     width="100" height="100">
             {% endif %}
             <div>
-                <h4 class="card-title mb-1">{{ user.first_name }} {{ user.last_name }}</h4>
-                <p class="mb-1"><strong>Nom d’utilisateur :</strong> {{ user.username }}</p>
-                <p class="mb-1"><strong>Courriel :</strong> {{ user.email }}</p>
-                <p class="mb-0"><strong>Bio :</strong> {{ user.bio|default:"Aucune biographie." }}</p>
+                <h4 class="card-title mb-1">{{ profile_user.first_name }} {{ profile_user.last_name }}</h4>
+                <p class="mb-1"><strong>Nom d’utilisateur :</strong> {{ profile_user.username }}</p>
+                <p class="mb-1"><strong>Courriel :</strong> {{ profile_user.email }}</p>
+                <p class="mb-0"><strong>Bio :</strong> {{ profile_user.bio|default:"Aucune biographie." }}</p>
             </div>
         </div>
         <div class="card-footer text-end">
@@ -34,7 +34,7 @@
                     Activités proposées
                 </div>
                 <ul class="list-group list-group-flush">
-                    {% for activity in user.proposed_activities.all %}
+                    {% for activity in profile_user.proposed_activities.all %}
                         <li class="list-group-item">
                             <a href="{% url 'activity_detail' activity.id %}">
                                 {{ activity.title }}
@@ -55,7 +55,7 @@
                     Inscriptions
                 </div>
                 <ul class="list-group list-group-flush">
-                    {% for activity in user.attended_activities.all %}
+                    {% for activity in profile_user.attended_activities.all %}
                         <li class="list-group-item">
                             <a href="{% url 'activity_detail' activity.id %}">
                                 {{ activity.title }}
@@ -71,6 +71,5 @@
             </div>
         </div>
     </div>
-
 </div>
 {% endblock %}

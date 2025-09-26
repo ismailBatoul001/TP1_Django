@@ -6,7 +6,25 @@ from .models import Activity, User, Category
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.core.paginator import Paginator
+import urllib.request, requests
+import json
+from urllib import parse
+api_key = settings.API_KEY
 
+def get_air_quality(city):
+
+    city = parse.quote(city)
+
+    try:
+        res = urllib.request.urlopen(f"https://api.waqi.info/feed/{city}/?token={api_key}")
+        donnees = json.loads(res.read())
+        if donnees["status"] == "ok":
+            aqi = donnees["data"]["aqi"]
+        else:
+            return "Qualité de l'air non disponible"
+        return f"{aqi}"
+    except Exception as e:
+        return "Qualité de l'air non disponible"
 
 def base(request):
     activities = Activity.objects.all()
@@ -38,20 +56,16 @@ def base(request):
 
     return render(request, "registration/accueil.html", context)
 
-def page404(request):
-    return render(request, "404.html", status=404)
-
-def page500(request):
-    return render(request, "500.html", status=500)
-
 def activity_detail(request, pk):
-    activity = Activity.objects.get(pk=pk)
+    activity = get_object_or_404(Activity, pk=pk)
+    air_quality = get_air_quality(activity.location_city)
     return render(request, "registration/activity_detail.html", {
         'activity': activity,
+        'air_quality': air_quality,
     })
 
 def unsubscribe_activity(request, pk):
-    activity = Activity.objects.get(pk=pk)
+    activity = get_object_or_404(Activity, pk=pk)
     if request.user in activity.attendees.all():
         activity.attendees.remove(request.user)
         messages.success(request, "Vous vous êtes désinscrit de l'activité.")
@@ -141,9 +155,8 @@ def create_activity(request):
     })
 
 def profile(request, id=None):
-    MEDIA_URL = settings.MEDIA_URL
-    user = get_object_or_404(User, id=id)
-    return render(request, 'registration/profile.html', {'MEDIA_URL': MEDIA_URL , 'user': user})
+    profile_user = get_object_or_404(User, id=id)
+    return render(request, 'registration/profile.html', {'MEDIA_URL': settings.MEDIA_URL, 'profile_user': profile_user})
 
 def edit_profile(request):
     if not request.user.is_authenticated:

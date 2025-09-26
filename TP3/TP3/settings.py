@@ -28,6 +28,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', '.localhost']
 
+API_KEY = '63f5c5455a579a2ab1dba777267d39b5c9cfc892'
 
 # Application definition
 
